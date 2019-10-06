@@ -1,0 +1,25 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+  tasks:
+  - apt:
+      name: "{{ packages }}"
+      state: present
+    vars:
+      packages:
+      - build-essential
+      - git
+      - nodejs
+      - tmux
+      - vim-nox
+      - powerline
+  - git_config:
+      name: user.name
+      scope: global
+      value: 'Craig J Perry'
+  - git_config:
+      name: user.email
+      scope: global
+      value: 'craigp84@gmail.com'
+

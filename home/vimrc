@@ -1,0 +1,181 @@
+" Craig's .vimrc (with comments)
+" vim:set ft=vim et sw=2:
+
+" Powerline
+python3 from powerline.vim import setup as powerline_setup
+python3 powerline_setup()
+python3 del powerline_setup
+set showtabline=2
+
+" Colours
+set t_Co=256
+
+" Requires ".vim/colors/monokai.vim"
+colorscheme monokai
+
+" Enable "hybrid" line numbering in normal mode for easier vim motions
+set number relativenumber
+" Use absolute numbering at all other times
+augroup numbertoggle
+  autocmd!
+  autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
+  autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
+augroup END
+
+" Auto-detect file type for syntax highlighting and try to enable their plugins
+filetype plugin indent on
+syntax enable
+set autoindent
+set backspace=indent,eol,start
+set smarttab
+set textwidth=78
+set dictionary+=/usr/share/dict/words
+set infercase
+set showmatch
+set virtualedit=block
+set shiftround
+
+" Complete words with CTRL+n/p
+set complete=.,w,b,u,t
+" Complete syntax with CTRL+x-CTRL+o
+set omnifunc=syntaxcomplete#Complete
+set completefunc=syntaxcomplete#Complete
+" Complete filenames with CTRL+x-CTRL+f
+" Complete lines with CTRL+x-CTRL+l
+
+" CTRL+a/x will increment/decrement a number or letter under the cursor
+set nrformats=hex,alpha
+
+" Move lines up or down with CTRL+j/k in any mode
+nnoremap <C-j> :m .+1<CR>==
+nnoremap <C-k> :m .-2<CR>==
+inoremap <C-j> <Esc>:m .+1<CR>==gi
+inoremap <C-k> <Esc>:m .-2<CR>==gi
+vnoremap <C-j> :m '>+1<CR>gv=gv
+vnoremap <C-k> :m '<-2<CR>gv=gv
+
+" Avoid annoying missed ESC keys when the host CPU is swamped
+set ttimeout
+set ttimeoutlen=100
+
+" Case insensitive search unless you search for a capital letter
+set smartcase
+set incsearch
+" Use <C-l> to clear the highlighting of :set hlsearch
+nnoremap <silent> <C-L> :nohlsearch<C-R>=has('diff')?'<Bar>diffupdate':''<CR><CR><C-L>
+
+" Lowering this improves performance in files with long lines
+set synmaxcol=500
+
+" Show a normal statusline with ruler but adding in filetype
+set laststatus=2
+set statusline=%<%f\ %h%m%r%y%=%-14.(%l,%c%V%)\ %P
+
+set wildmenu
+setglobal wildmode=full
+setglobal wildignore+=tags,.*.un~,*.pyc
+
+set scrolloff=1
+set sidescrolloff=5
+
+" Show as much of a line as possible, don't truncate long lines with @
+set display+=lastline
+if exists('+breakindent')
+  set breakindent showbreak=\ +
+endif
+setglobal lazyredraw
+
+set listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+
+
+" Show trailing whitespace characters
+highlight ExtraWhitespace ctermbg=red guibg=red
+match ExtraWhitespace /\s\+$/
+autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+autocmd BufWinLeave * call clearmatches()
+
+autocmd FileType json set sw=2 et
+autocmd FileType * setlocal nolinebreak
+autocmd FileType mail,gitcommit setlocal tw=72
+let python_highlight_all=1
+au BufNewFile,BufRead *.py
+    \ set tabstop=4 |
+    \ set softtabstop=4 |
+    \ set shiftwidth=4 |
+    \ set textwidth=79 |
+    \ set expandtab |
+    \ set autoindent |
+    \ set fileformat=unix
+
+setglobal confirm
+setglobal showcmd
+setglobal visualbell
+
+" Delete comment character when joining commented lines
+set formatoptions+=j
+
+set path=.,,
+set include=
+if has('path_extra')
+  setglobal tags-=./tags tags-=tags; tags^=./tags;
+endif
+
+set shell=/bin/bash
+set history=1000
+set autoread
+set tabpagemax=50
+if !empty(&viminfo)
+  set viminfo^=!
+endif
+set sessionoptions-=options
+
+" Load matchit.vim, but only if the user hasn't installed a newer version
+if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &rtp) ==# ''
+  runtime! macros/matchit.vim
+endif
+
+" Undo line in insert mode
+inoremap <C-U> <C-G>u<C-U>
+" Undo word in insert mode
+inoremap <C-W> <C-G>u<C-W>
+
+" Toggle paste mode
+nnoremap <F2> :set invpaste paste?<CR>
+set pastetoggle=<F2>
+
+" D means delete to the end of the line, mimic this for Y (copy/yank to end of line)
+nnoremap Y y$
+
+" Map :Q to :q
+command! Q q
+command! W w
+
+" Persist undo info for files, indefinitely
+if !isdirectory($HOME."/.vim/undo")
+  call mkdir($HOME."/.vim/undo", "p", 0700)
+endif
+set undodir=~/.vim/undo
+set undofile
+
+" set cursorline
+" set cursorcolumn
+
+" Buffer management
+nnoremap <leader>b :buffers<CR>:buffer 
+
+" List tabs
+nnoremap <leader>t :tabs<CR>:tab 
+" New tab
+nnoremap <leader>T :tabnew<CR>
+" Move left/right tab
+nnoremap <leader>h :tabprev<CR>
+nnoremap <leader>l :tabnext<CR>
+
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+map <C-n> :NERDTreeToggle<CR>
+nmap <F8> :TagbarToggle<CR>
+
+" :vert diffsplit <otherfile>
+

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+[[ ! -d ~/notebooks ]] && mkdir ~/notebooks
+cd ~/notebooks
+exec jupyter-notebook --ip=0.0.0.0
+

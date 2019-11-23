@@ -3,23 +3,125 @@
   connection: local
   gather_facts: no
   tasks:
-  - apt:
+  - name: Update Base OS, limit to once per day
+    apt:
+      name: "*"
+      state: latest
+      update_cache: yes
+      cache_valid_time: 86400
+      force_apt_get: yes
+  - name: Install non-bleeding edge apps from package manager
+    apt:
       name: "{{ packages }}"
       state: present
     vars:
       packages:
+      # Developer Tools
       - build-essential
       - git
       - nodejs
+      - npm
+      - python3
+      - python3-pip
+      - python3-venv
+      # Dependencies for libs installed via pip below
+      - libatlas-base-dev
+      # Network Tools
+      - nmap
+      - netcat
+      # User Tools
       - tmux
       - vim-nox
+      - exuberant-ctags
       - powerline
-  - git_config:
+      # Desktop
+      - xrdp
+      - i3
+      - dmenu
+      - suckless-tools
+      - fonts-firacode
+      - chromium-browser
+      # HAM Radio Tools
+      - xastir
+  - name: Upgrade pip
+    shell: python3 -m pip install -U pip
+  - name: Use pip to install more recent versions of certain packages
+    pip:
+      name: "{{ packages }}"
+      state: present
+      executable: pip3
+      extra_args: --user
+    vars:
+      packages:
+      - jupyter
+      - matplotlib
+      - numpy
+      - pandas
+      - scipy
+      - seaborn
+    become: yes
+    become_user: pi
+  - name: Workaround broken jupyter dependency currently
+    pip:
+      name: "prompt-toolkit==1.0.16"
+      state: present
+      executable: pip3
+      extra_args: --user --force
+    become: yes
+    become_user: pi
+  - name: Setup git username
+    git_config:
       name: user.name
       scope: global
       value: 'Craig J Perry'
-  - git_config:
+  - name: Setup git email
+    git_config:
       name: user.email
       scope: global
       value: 'craigp84@gmail.com'
+  - name: Copy tmux config
+    copy:
+      src: home/tmux.conf
+      dest: ~/.tmux.conf
+  - name: Copy xdg config
+    copy:
+      src: home/config/
+      dest: ~/.config/
+  - name: Copy bin Scripts
+    copy:
+      src: home/bin/
+      dest: ~/bin/
+  - name: Copy Xresources
+    copy:
+      src: home/Xresources
+      dest: ~/.Xresources
+  - name: Copy vimrc
+    copy:
+      src: home/vimrc
+      dest: ~/.vimrc
+  - name: Copy vim config dir
+    copy:
+      src: home/vim
+      dest: ~/.vim
+  # Ordinarily you would just use git submodules for this, much simpler
+  - name: Install vim sensible package
+    git:
+      repo: 'https://github.com/tpope/vim-sensible.git'
+      dest: ~/.vim/pack/tpope/start/vim-sensible
+      update: no
+  - name: Install vim fugitive package
+    git:
+      repo: 'https://github.com/tpope/vim-fugitive.git'
+      dest: ~/.vim/pack/tpope/start/vim-fugitive
+      update: no
+  - name: Install vim NERDtree package
+    git:
+      repo: 'https://github.com/scrooloose/nerdtree.git'
+      dest: ~/.vim/pack/scrooloose/start/nerdtree
+      update: no
+  - name: Install vim tagbar package
+    git:
+      repo: 'https://github.com/majutsushi/tagbar.git'
+      dest: ~/.vim/pack/majutsushi/start/tagbar
+      update: no
 

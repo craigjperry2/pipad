@@ -1,0 +1,8 @@
+XTerm*renderFont: true
+XTerm*faceName: Fira Code
+XTerm*faceSize: 14
+
+UXTerm*renderFont: true
+UXTerm*faceName: Fira Code
+UXTerm*faceSize: 14
+

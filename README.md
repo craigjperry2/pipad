@@ -11,9 +11,29 @@ Create an empty file called `ssh` in the boot dir of the new SD.
 
 Create a file called `wpa-supplicant.conf` in the boot dir of the new SD with
 the WiFi connection details. It's possible to configure multiple networks to
-try in order.
+try in order. Something like:
 
-Boot the device, then reboot the device for these to take effect.
+    ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+    update_config=1
+    country=GB
+
+    network={
+      priority=30
+      ssid="Phone"
+      psk="???"
+      key_mgmt=WPA-PSK
+      id_str="phone"
+    }
+
+    network={
+      priority=50
+      ssid=“Home"
+      psk="???"
+      key_mgmt=WPA-PSK
+      id_str="home"
+    }
+
+Boot the device, then reboot the device for all initial setup to take effect.
 
 Run the following commands:
 
